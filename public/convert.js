@@ -5,13 +5,6 @@ const convert = async (fileToRead) => {
     const desiredWorkSheet = workbook._worksheets.filter((worksheet) => worksheet.name === 'Sponsored Products Campaigns')[0]
 
     const dataRows = []
-    const impSubTotal = []
-    const clicksSubTotal = []
-    const spendSubTotal = []
-    const ordersSubTotal = []
-    const totalUnitsSubTotal = []
-    const salesSubTotal = []
-    const acosSubTotal = []
     desiredWorkSheet.eachRow((row, rowNumber) => {
 
         if (rowNumber !== 1) {
@@ -23,7 +16,7 @@ const convert = async (fileToRead) => {
                 newRow[8] = ''
                 newRow[9] = ''
                 newRow[10] = ''
-                newRow[14] = '' // CPC TODO
+                newRow[14] = ''
 
                 switch (colNumber) {
                     case 4: // Campaign
@@ -43,60 +36,49 @@ const convert = async (fileToRead) => {
                         break;
                     case 19: // Impressions
                         newRow[11] = Number(cell._value.model.value)
-                        impSubTotal.push(newRow[11])
                         break;
                     case 20: // Clicks
                         newRow[12] = Number(cell._value.model.value)
-                        clicksSubTotal.push(newRow[12])
                         break;
                     case 21: // Spend
                         newRow[15] = Number(cell._value.model.value)
-                        spendSubTotal.push(newRow[15])
                         break;
                     case 22: // Order
                         newRow[16] = Number(cell._value.model.value)
-                        ordersSubTotal.push(newRow[16])
                         break;
                     case 23: // Total Units
                         newRow[17] = Number(cell._value.model.value)
-                        totalUnitsSubTotal.push(newRow[17])
                         break;
                     case 24: // Sales
                         newRow[18] = Number(cell._value.model.value)
-                        salesSubTotal.push(newRow[18])
                         break;
                 }
             })
 
-            // CTR TODO - add '%'
             if (newRow[11] === 0 && newRow[12] === 0) {
                 newRow[13] = 0
             } else {
                 newRow[13] = newRow[12] / newRow[11]
             }
 
-            // CPC
             if (newRow[15] === 0 && newRow[12] === 0) {
-                newRow[14] = '$ 0'
+                newRow[14] = 0
             } else {
-                newRow[14] =  '$ ' + String(newRow[15] / newRow[12])
+                newRow[14] =  newRow[15] / newRow[12]
             }
 
-            // CVR TODO - add '%' (Same as CPC)
-            // if (newRow[15] === 0 && newRow[12] === 0) {
-            //     newRow[14] = '$ 0'
-            // } else {
-            //     newRow[14] =  '$ ' + String(newRow[15] / newRow[12])
-            // }
-            // headerRow[19]
+            if (newRow[16] === 0 && newRow[12] === 0) {
+                newRow[19] = 0
+            } else {
+                newRow[19] = newRow[16] / newRow[12]
+            }
 
-            // ACos TODO - add '%'
+
             if ((newRow[15] === 0 && newRow[18] === 0) || newRow[18] === 0) {
                 newRow[20] = 0
             } else {
                 newRow[20] = newRow[15] / newRow[18]
             }
-            acosSubTotal.push(newRow[20])
 
             // Type
             if (newRow[16] > 0 && newRow[20] < 0.3) {
@@ -112,9 +94,7 @@ const convert = async (fileToRead) => {
                 newRow[5] = 'Bleeder'
             }
 
-            // Convert 'Spend', 'Sales' to string
-            newRow[15] = '$ ' + String(newRow[15])
-            newRow[18] = '$ ' + String(newRow[18])
+
             dataRows.push(newRow)
         }
 
@@ -137,16 +117,16 @@ const convert = async (fileToRead) => {
     summaryRow[8] = ''
     summaryRow[9] = ''
     summaryRow[10] = ''
-    summaryRow[11] = Number(impSubTotal.reduce((a, b) => a + b, 0) / impSubTotal.length)
-    summaryRow[12] = Number(clicksSubTotal.reduce((a, b) => a + b, 0) / clicksSubTotal.length)
+    summaryRow[11] = ''
+    summaryRow[12] = ''
     summaryRow[13] = ''
     summaryRow[14] = ''
-    summaryRow[15] = Number(spendSubTotal.reduce((a, b) => a + b, 0) / spendSubTotal.length)
-    summaryRow[16] = Number(ordersSubTotal.reduce((a, b) => a + b, 0) / ordersSubTotal.length)
-    summaryRow[17] = Number(totalUnitsSubTotal.reduce((a, b) => a + b, 0) / totalUnitsSubTotal.length)
-    summaryRow[18] = Number(salesSubTotal.reduce((a, b) => a + b, 0) / salesSubTotal.length)
+    summaryRow[15] = ''
+    summaryRow[16] = ''
+    summaryRow[17] = ''
+    summaryRow[18] = ''
     summaryRow[19] = ''
-    summaryRow[20] = Number(acosSubTotal.reduce((a, b) => a + b, 0) / acosSubTotal.length)
+    summaryRow[20] = ''
 
     /* Header */
     const headerRow = [];
@@ -163,13 +143,13 @@ const convert = async (fileToRead) => {
     headerRow[10] = 'TOS New';
     headerRow[11] = 'Impressions';
     headerRow[12] = 'Clicks';
-    headerRow[13] = 'CTR'; // TODO top row
-    headerRow[14] = 'CPC'; // TODO top row
+    headerRow[13] = 'CTR';
+    headerRow[14] = 'CPC';
     headerRow[15] = 'Spend';
     headerRow[16] = 'Order';
     headerRow[17] = 'Total Units';
     headerRow[18] = 'Sales';
-    headerRow[19] = 'CVR'; // TODO top row
+    headerRow[19] = 'CVR';
     headerRow[20] = 'ACoS';
 
     /* insert new row and return as row object */
@@ -188,6 +168,7 @@ const convert = async (fileToRead) => {
             fgColor: { argb: 'fff7caac' },
             bgColor: { argb: 'FF0000FF' }
         }
+        cell.font = { bold: true }
     })
 
     const secondRow = sheet.findRow(2)
@@ -198,6 +179,7 @@ const convert = async (fileToRead) => {
             fgColor: { argb: 'ffb4c6e7' },
             bgColor: { argb: 'FF0000FF' }
         }
+        cell.font = { bold: true }
     })
 
     const typeColumn = sheet.getColumn(6)
@@ -226,6 +208,29 @@ const convert = async (fileToRead) => {
             }
         }
     })
+
+    sheet.getCell('L1').value = { formula: '=SUBTOTAL(9, L3:L9999)', date1904: false } // Imp
+    sheet.getCell('M1').value = { formula: '=SUBTOTAL(9, M3:M9999)', date1904: false } // Clicks
+    sheet.getCell('N1').value = { formula: '=L1/M1', date1904: false } // CTR
+    sheet.getCell('O1').value = { formula: '=P1/M1', date1904: false } // CPC
+    sheet.getCell('P1').value = { formula: '=SUBTOTAL(9, P3:P9999)', date1904: false } // Spend
+    sheet.getCell('Q1').value = { formula: '=SUBTOTAL(9, Q3:Q9999)', date1904: false } // Orders
+    sheet.getCell('R1').value = { formula: '=SUBTOTAL(9, R3:R9999)', date1904: false } // Total Units
+    sheet.getCell('S1').value = { formula: '=SUBTOTAL(9, S3:S9999)', date1904: false } // Sales
+    sheet.getCell('T1').value = { formula: '=Q1/M1', date1904: false } // CVR
+    sheet.getCell('U1').value = { formula: '=P1/S1', date1904: false } // ACoS
+
+    sheet.getColumn(14).numFmt = '0.00%' // CTR
+    sheet.getColumn(15).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00' // CPC
+    sheet.getColumn(16).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00' // Spend
+    sheet.getColumn(19).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00' // Sales
+    sheet.getColumn(20).numFmt = '0.00%' // CVR
+    sheet.getColumn(21).numFmt = '0.00%' // ACoS
+
+
+    sheet.views = [
+        { state: 'frozen', xSplit: 0, ySplit: 2 }
+    ];
 
     return workbook2
 
