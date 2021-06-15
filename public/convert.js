@@ -10,13 +10,13 @@ const convert = async (fileToRead) => {
         if (rowNumber !== 1) {
             const newRow = []
             row.eachCell((cell, colNumber) => {
+                newRow[4] = ''
                 newRow[5] = ''
                 newRow[6] = ''
                 newRow[7] = ''
                 newRow[8] = ''
                 newRow[9] = ''
-                newRow[10] = ''
-                newRow[14] = ''
+                newRow[13] = ''
 
                 switch (colNumber) {
                     case 4: // Campaign
@@ -25,73 +25,73 @@ const convert = async (fileToRead) => {
                     case 10: // Ad Group
                         newRow[1] = cell._value.model.value
                         break
-                    case 11: // Max bid
-                        newRow[2] = Number(cell._value.model.value)
-                        break;
                     case 12: // Keyword or Product Targeting
-                        newRow[3] = cell._value.model.value
+                        newRow[2] = cell._value.model.value
                         break;
                     case 14: // Match Type
-                        newRow[4] = cell._value.model.value
+                        newRow[3] = cell._value.model.value
+                        break;
+                    case 11: // Max bid
+                        newRow[6] = Number(cell._value.model.value)
                         break;
                     case 19: // Impressions
-                        newRow[11] = Number(cell._value.model.value)
+                        newRow[10] = Number(cell._value.model.value)
                         break;
                     case 20: // Clicks
-                        newRow[12] = Number(cell._value.model.value)
+                        newRow[11] = Number(cell._value.model.value)
                         break;
                     case 21: // Spend
-                        newRow[15] = Number(cell._value.model.value)
+                        newRow[14] = Number(cell._value.model.value)
                         break;
                     case 22: // Order
-                        newRow[16] = Number(cell._value.model.value)
+                        newRow[15] = Number(cell._value.model.value)
                         break;
                     case 23: // Total Units
-                        newRow[17] = Number(cell._value.model.value)
+                        newRow[16] = Number(cell._value.model.value)
                         break;
                     case 24: // Sales
-                        newRow[18] = Number(cell._value.model.value)
+                        newRow[17] = Number(cell._value.model.value)
                         break;
                 }
             })
 
-            if (newRow[11] === 0 && newRow[12] === 0) {
+            if (newRow[10] === 0 && newRow[11] === 0) {
+                newRow[12] = 0
+            } else {
+                newRow[12] = newRow[11] / newRow[10]
+            }
+
+            if (newRow[14] === 0 && newRow[11] === 0) {
                 newRow[13] = 0
             } else {
-                newRow[13] = newRow[12] / newRow[11]
+                newRow[13] =  newRow[14] / newRow[11]
             }
 
-            if (newRow[15] === 0 && newRow[12] === 0) {
-                newRow[14] = 0
+            if ((newRow[15] === 0 && newRow[11] === 0 ) || newRow[11] === 0) {
+                newRow[18] = 0
             } else {
-                newRow[14] =  newRow[15] / newRow[12]
+                newRow[18] = newRow[15] / newRow[11]
             }
 
-            if ((newRow[16] === 0 && newRow[12] === 0 ) || newRow[12] === 0) {
+
+            if ((newRow[14] === 0 && newRow[17] === 0) || newRow[17] === 0) {
                 newRow[19] = 0
             } else {
-                newRow[19] = newRow[16] / newRow[12]
-            }
-
-
-            if ((newRow[15] === 0 && newRow[18] === 0) || newRow[18] === 0) {
-                newRow[20] = 0
-            } else {
-                newRow[20] = newRow[15] / newRow[18]
+                newRow[19] = newRow[14] / newRow[17]
             }
 
             /* Type */
-            if (newRow[16] > 0 && newRow[20] < 0.3) {
-                newRow[5] = 'Convertor'
+            if (newRow[15] > 0 && newRow[19] < 0.3) {
+                newRow[4] = 'Convertor'
             }
-            else if (newRow[16] > 0 && newRow[20] > 0.3) {
-                newRow[5] = 'Spender'
+            else if (newRow[15] > 0 && newRow[19] > 0.3) {
+                newRow[4] = 'Spender'
             }
-            else if (newRow[16] === 0 && newRow[15] < 10) {
-                newRow[5] = 'Bleeding in process'
+            else if (newRow[15] === 0 && newRow[14] < 10) {
+                newRow[4] = 'Bleeding in process'
             }
-            else if (newRow[16] === 0 && newRow[15] > 10) {
-                newRow[5] = 'Bleeder'
+            else if (newRow[15] === 0 && newRow[14] > 10) {
+                newRow[4] = 'Bleeder'
             }
 
 
@@ -126,31 +126,29 @@ const convert = async (fileToRead) => {
     summaryRow[17] = ''
     summaryRow[18] = ''
     summaryRow[19] = ''
-    summaryRow[20] = ''
 
     /* Header */
     const headerRow = [];
     headerRow[0] = 'Campaign';
     headerRow[1] = 'Ad Group';
-    headerRow[2] = 'Max bid';
-    headerRow[3] = 'Keyword or Product Targeting';
-    headerRow[4] = 'Match Type';
-    headerRow[5] = 'Type';
-    headerRow[6] = 'Why';
-    headerRow[7] = 'Bid';
-    headerRow[8] = 'TOS';
-    headerRow[9] = 'New Bid';
-    headerRow[10] = 'TOS New';
-    headerRow[11] = 'Impressions';
-    headerRow[12] = 'Clicks';
-    headerRow[13] = 'CTR';
-    headerRow[14] = 'CPC';
-    headerRow[15] = 'Spend';
-    headerRow[16] = 'Order';
-    headerRow[17] = 'Total Units';
-    headerRow[18] = 'Sales';
-    headerRow[19] = 'CVR';
-    headerRow[20] = 'ACoS';
+    headerRow[2] = 'Keyword or Product Targeting';
+    headerRow[3] = 'Match Type';
+    headerRow[4] = 'Type';
+    headerRow[5] = 'Why';
+    headerRow[6] = 'Max bid';
+    headerRow[7] = 'TOS';
+    headerRow[8] = 'New Bid';
+    headerRow[9] = 'TOS New';
+    headerRow[10] = 'Impressions';
+    headerRow[11] = 'Clicks';
+    headerRow[12] = 'CTR';
+    headerRow[13] = 'CPC';
+    headerRow[14] = 'Spend';
+    headerRow[15] = 'Order';
+    headerRow[16] = 'Total Units';
+    headerRow[17] = 'Sales';
+    headerRow[18] = 'CVR';
+    headerRow[19] = 'ACoS';
 
     /* insert new row and return as row object */
     sheet.insertRow(1, summaryRow);
@@ -182,7 +180,7 @@ const convert = async (fileToRead) => {
         cell.font = { bold: true }
     })
 
-    const typeColumn = sheet.getColumn(6)
+    const typeColumn = sheet.getColumn(5)
     typeColumn.eachCell((cell, rowNumber) => {
         if (rowNumber !== 1 && rowNumber !== 2) {
             let colorToFill
@@ -209,23 +207,23 @@ const convert = async (fileToRead) => {
         }
     })
 
-    sheet.getCell('L1').value = { formula: '=SUBTOTAL(9, L3:L9999)', date1904: false } // Imp
-    sheet.getCell('M1').value = { formula: '=SUBTOTAL(9, M3:M9999)', date1904: false } // Clicks
-    sheet.getCell('N1').value = { formula: '=L1/M1', date1904: false } // CTR
-    sheet.getCell('O1').value = { formula: '=P1/M1', date1904: false } // CPC
-    sheet.getCell('P1').value = { formula: '=SUBTOTAL(9, P3:P9999)', date1904: false } // Spend
-    sheet.getCell('Q1').value = { formula: '=SUBTOTAL(9, Q3:Q9999)', date1904: false } // Orders
-    sheet.getCell('R1').value = { formula: '=SUBTOTAL(9, R3:R9999)', date1904: false } // Total Units
-    sheet.getCell('S1').value = { formula: '=SUBTOTAL(9, S3:S9999)', date1904: false } // Sales
-    sheet.getCell('T1').value = { formula: '=Q1/M1', date1904: false } // CVR
-    sheet.getCell('U1').value = { formula: '=P1/S1', date1904: false } // ACoS
+    sheet.getCell('K1').value = { formula: '=SUBTOTAL(9, K3:K9999)', date1904: false } // Imp
+    sheet.getCell('L1').value = { formula: '=SUBTOTAL(9, L3:L9999)', date1904: false } // Clicks
+    sheet.getCell('M1').value = { formula: '=L1/K1', date1904: false } // CTR
+    sheet.getCell('N1').value = { formula: '=O1/L1', date1904: false } // CPC
+    sheet.getCell('O1').value = { formula: '=SUBTOTAL(9, O3:O9999)', date1904: false } // Spend
+    sheet.getCell('P1').value = { formula: '=SUBTOTAL(9, P3:P9999)', date1904: false } // Orders
+    sheet.getCell('Q1').value = { formula: '=SUBTOTAL(9, Q3:Q9999)', date1904: false } // Total Units
+    sheet.getCell('R1').value = { formula: '=SUBTOTAL(9, R3:R9999)', date1904: false } // Sales
+    sheet.getCell('S1').value = { formula: '=P1/L1', date1904: false } // CVR
+    sheet.getCell('T1').value = { formula: '=O1/R1', date1904: false } // ACoS
 
-    sheet.getColumn(14).numFmt = '0.00%' // CTR
-    sheet.getColumn(15).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00' // CPC
-    sheet.getColumn(16).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00' // Spend
-    sheet.getColumn(19).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00' // Sales
-    sheet.getColumn(20).numFmt = '0.00%' // CVR
-    sheet.getColumn(21).numFmt = '0.00%' // ACoS
+    sheet.getColumn(13).numFmt = '0.00%' // CTR
+    sheet.getColumn(14).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00' // CPC
+    sheet.getColumn(15).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00' // Spend
+    sheet.getColumn(18).numFmt = '"$"#,##0.00;[Red]\-"$"#,##0.00' // Sales
+    sheet.getColumn(19).numFmt = '0.00%' // CVR
+    sheet.getColumn(20).numFmt = '0.00%' // ACoS
 
 
     sheet.views = [
