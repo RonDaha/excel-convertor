@@ -67,7 +67,7 @@ const convert = async (fileToRead) => {
                 newRow[14] =  newRow[15] / newRow[12]
             }
 
-            if (newRow[16] === 0 && newRow[12] === 0) {
+            if ((newRow[16] === 0 && newRow[12] === 0 ) || newRow[12] === 0) {
                 newRow[19] = 0
             } else {
                 newRow[19] = newRow[16] / newRow[12]
@@ -80,7 +80,7 @@ const convert = async (fileToRead) => {
                 newRow[20] = newRow[15] / newRow[18]
             }
 
-            // Type
+            /* Type */
             if (newRow[16] > 0 && newRow[20] < 0.3) {
                 newRow[5] = 'Convertor'
             }
