@@ -10,7 +10,7 @@
             padding: 0;
         }
 
-      div {
+      .container {
         height: 100vh;
         display: flex;
         justify-content: center;
@@ -72,6 +72,20 @@
           100% { transform: rotate(360deg); }
       }
 
+      .link {
+          color: #2c3e50;
+          position: absolute;
+          left: 50%;
+          transform: translate(-50%, 0);
+          bottom: 50px;
+          font-size: 18px;
+      }
+      a {
+          text-decoration: none;
+          color: #2c3e50;
+          border-bottom: 1px solid #2c3e50;
+      }
+
 
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.2.1/exceljs.min.js"></script>
@@ -79,13 +93,15 @@
 </head>
 <body>
 
-<div>
+<div class="container">
     <div class="loader-container">
         <div class="loader"></div>
     </div>
-
     <button>Choose File</button>
     <input type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+    <div class="link">
+        <a target="_blank" href="https://www.linkedin.com/in/ron-dahan-308ba2173/">Created By Ron Dahan</a>
+    </div>
 </div>
 
 <script>
@@ -110,15 +126,21 @@
         const fr = new FileReader();
 
         fr.onload = async () => {
-            const workbook = await convert(fr.result)
+            const report = await convert(fr.result)
+            if (!report) {
+                alert('Unsupported file')
+                loaderContainer.classList.remove('show')
+                return
+            }
+            const { workbook, name } = report
             const workbookBuffer = await workbook.xlsx.writeBuffer()
             const a = document.createElement("a");
-            a.style.display = "none";
+            a.style.display = 'none';
             document.body.appendChild(a);
             const blob = new Blob([workbookBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
             a.href = window.URL.createObjectURL(blob);
             const d = new Date().toLocaleDateString()
-            a.setAttribute("download", `analyzed ${d}.xlsx`);
+            a.setAttribute('download', name);
             a.click();
             loaderContainer.classList.remove('show')
         };
